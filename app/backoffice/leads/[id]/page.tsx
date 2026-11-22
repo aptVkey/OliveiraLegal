@@ -12,6 +12,8 @@ import { Badge, BackLink, PageHead } from '@/components/ui'
 import { NotesPanel, type NoteRow } from '../../notas/notes-panel'
 import { convertLead, deleteLead, updateLead } from '../actions'
 import { LeadFields } from '../lead-fields'
+import { BOOKING_STATUS } from '../../agendamentos/labels'
+import { MODE_LABEL, money, shortDateTime } from '@/lib/booking/format'
 
 export const metadata: Metadata = { title: 'Lead' }
 
@@ -19,11 +21,13 @@ export default async function LeadPage({ params }: { params: Promise<{ id: strin
   const me = await requireMember()
   const { id } = await params
   const db = await createClient()
-  const [{ data: lead }, members, areas, { data: notes }] = await Promise.all([
+  const [{ data: lead }, members, areas, { data: notes }, { data: bookings }] = await Promise.all([
     db.from('leads').select('*, area:practice_areas(name), owner:profiles!leads_owner_id_fkey(full_name), client:clients(id, name)').eq('id', id).maybeSingle(),
     getMembers(), getAreas(),
     db.from('notes').select('id, body, kind, created_at, edited_at, author_id, lead_id, author:profiles(full_name)')
       .eq('lead_id', id).order('created_at', { ascending: false }),
+    db.from('bookings').select('id, reference, status, mode, starts_at, amount_cents, currency')
+      .eq('lead_id', id).not('status', 'eq', 'rascunho').order('created_at', { ascending: false }),
   ])
   if (!lead) notFound()
 
@@ -63,6 +67,25 @@ export default async function LeadPage({ params }: { params: Promise<{ id: strin
               {lead.client && <><dt>Cliente</dt><dd><Link className="link" href={`/backoffice/clientes/${lead.client.id}`}>{lead.client.name}</Link></dd></>}
             </dl>
           </div>
+          {!!bookings?.length && (
+            <div className="card">
+              <h2>Consultas marcadas no site</h2>
+              <div className="list">
+                {bookings.map(b => {
+                  const st = BOOKING_STATUS[b.status] ?? { label: b.status }
+                  return (
+                    <div className="list__item" key={b.id}>
+                      <span>
+                        {b.starts_at ? shortDateTime(b.starts_at) : '—'} · {b.mode ? MODE_LABEL[b.mode] : '—'}
+                        <div className="small muted">{b.reference}{b.amount_cents != null ? ` · ${money(b.amount_cents, b.currency ?? 'eur')}` : ''}</div>
+                      </span>
+                      <Badge tone={st.tone}>{st.label}</Badge>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
           <NotesPanel notes={(notes ?? []) as unknown as NoteRow[]} leadId={lead.id} meId={me.id} isSocio={me.role === 'socio'} />
           {me.role === 'socio' && (
             <form action={deleteLead} className="no-print">

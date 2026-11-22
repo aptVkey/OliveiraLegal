@@ -6,6 +6,7 @@ export type Section = { slug: string; label: string; group: string; icon: string
 export const SECTIONS: Section[] = [
   { slug: '', label: 'Painel', group: 'Geral', icon: 'M4 4h7v7H4zM13 4h7v4h-7zM13 10h7v10h-7zM4 13h7v7H4z' },
   { slug: 'leads', label: 'Leads', group: 'Crescimento', icon: 'M3 5h18l-7 8v6l-4-2v-4z' },
+  { slug: 'agendamentos', label: 'Agendamentos', group: 'Crescimento', icon: 'M4 6h16v14H4zM4 10h16M8 3v5M16 3v5M8 14h2M14 14h2M8 17h2' },
   { slug: 'clientes', label: 'Clientes', group: 'Escritório', icon: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 20c1.5-3.5 4.5-5 8-5s6.5 1.5 8 5' },
   { slug: 'casos', label: 'Casos', group: 'Escritório', icon: 'M4 7h16v12H4zM9 7V5h6v2' },
   { slug: 'tarefas', label: 'Tarefas', group: 'Escritório', icon: 'M5 12l4 4L19 6' },

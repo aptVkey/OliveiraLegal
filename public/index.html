@@ -25,6 +25,8 @@
   <symbol id="i-tel" viewBox="0 0 40 40"><path d="M11 5L6 9C5 10 6 16 12 24C18 32 25 35 28 34L34 29L27 22L23 26C19 24 16 20 14 16L18 12Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-mail" viewBox="0 0 40 40"><path d="M4 10H36V32H4ZM4 11L20 24L36 11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-cal" viewBox="0 0 40 40"><path d="M6 9H34V35H6ZM6 17H34M13 4V13M27 4V13M13 24H17M23 24H27" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-video" viewBox="0 0 40 40"><path d="M5 11H27V29H5ZM27 17L35 12V28L27 23" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 40 40"><path d="M10 18H30V35H10ZM14 18V13A6 6 0 0 1 26 13V18M20 25V28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="arrow" viewBox="0 0 24 24"><path d="M4 12H20M13 5L20 12L13 19" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 </svg>
 
@@ -212,10 +214,128 @@
     </div>
   </section>
 
+  <!-- ─────────── Agendar (ativado no backoffice) ─────────── -->
+  <section class="book" id="agendar" aria-labelledby="book-title" hidden>
+    <div class="wrap">
+      <p class="eyebrow" data-reveal><span class="num">03</span>Agendar</p>
+      <div class="book__head">
+        <h2 class="display display--sm" id="book-title" data-lines>
+          <span class="line"><span data-bk-title1>Marque a sua</span></span>
+          <span class="line"><span><em data-bk-title2>consulta.</em></span></span>
+        </h2>
+        <p class="book__intro" data-reveal data-bk-intro>Escolha o dia, a hora e o formato que lhe for mais conveniente. A consulta fica confirmada logo após o pagamento, e recebe o convite para o seu calendário por e-mail.</p>
+      </div>
+
+      <div class="bk" data-reveal data-bk>
+        <!-- Progresso -->
+        <ol class="bk__steps" aria-label="Passos da marcação">
+          <li class="is-current" data-bk-stepnav="1"><span class="bk__num">i.</span><span class="bk__label">Contactos</span></li>
+          <li data-bk-stepnav="2"><span class="bk__num">ii.</span><span class="bk__label">Data e hora</span></li>
+          <li data-bk-stepnav="3"><span class="bk__num">iii.</span><span class="bk__label">Detalhes</span></li>
+          <li data-bk-stepnav="4"><span class="bk__num">iv.</span><span class="bk__label">Pagamento</span></li>
+        </ol>
+        <div class="bk__progress" aria-hidden="true"><i data-bk-bar></i></div>
+
+        <div class="bk__grid">
+          <div class="bk__stage" aria-live="polite">
+
+            <!-- 1 · Contactos -->
+            <form class="bk__step is-active" data-bk-step="1" novalidate>
+              <h3 class="bk__title">Os seus contactos</h3>
+              <p class="bk__hint">Usamos estes dados apenas para confirmar e preparar a consulta.</p>
+              <div class="bk__fields">
+                <div class="field"><label for="bk-name">Nome completo</label><input id="bk-name" name="name" type="text" autocomplete="name" maxlength="120" required></div>
+                <div class="field"><label for="bk-email">E-mail</label><input id="bk-email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="200" required></div>
+                <div class="field"><label for="bk-phone">Telefone <span class="bk__opt">(opcional)</span></label><input id="bk-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="40"></div>
+                <div class="bk__trap" aria-hidden="true"><label for="bk-website">Website</label><input id="bk-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+              </div>
+              <label class="consent">
+                <input type="checkbox" name="consent" required>
+                <span class="consent__box" aria-hidden="true"></span>
+                <span>Autorizo o tratamento dos meus dados pela Oliveira Legal para a marcação e preparação desta consulta.</span>
+              </label>
+              <div class="bk__foot">
+                <span></span>
+                <button class="btn" type="submit"><span class="btn__label">Continuar</span><span class="btn__icon"><svg aria-hidden="true"><use href="#arrow"/></svg></span></button>
+              </div>
+            </form>
+
+            <!-- 2 · Data e hora -->
+            <div class="bk__step" data-bk-step="2">
+              <h3 class="bk__title">Escolha o dia e a hora</h3>
+              <p class="bk__hint">Horários em hora de Portugal continental. <span data-bk-duration></span></p>
+              <div class="bk__daysbar">
+                <p class="bk__month" data-bk-month></p>
+                <div class="bk__arrows">
+                  <button type="button" class="bk__arrow" data-bk-scroll="-1" aria-label="Dias anteriores"><svg aria-hidden="true"><use href="#arrow"/></svg></button>
+                  <button type="button" class="bk__arrow" data-bk-scroll="1" aria-label="Dias seguintes"><svg aria-hidden="true"><use href="#arrow"/></svg></button>
+                </div>
+              </div>
+              <div class="bk__days" role="listbox" aria-label="Dias disponíveis" data-bk-days></div>
+              <div class="bk__slots" role="listbox" aria-label="Horas disponíveis" data-bk-slots></div>
+              <div class="bk__foot">
+                <button type="button" class="bk__back" data-bk-back>Voltar</button>
+                <button class="btn" type="button" data-bk-next="3" disabled><span class="btn__label">Continuar</span><span class="btn__icon"><svg aria-hidden="true"><use href="#arrow"/></svg></span></button>
+              </div>
+            </div>
+
+            <!-- 3 · Detalhes -->
+            <form class="bk__step" data-bk-step="3" novalidate>
+              <h3 class="bk__title">Como prefere reunir?</h3>
+              <div class="bk__modes" role="radiogroup" aria-label="Formato da reunião" data-bk-modes></div>
+              <div class="bk__fields">
+                <div class="field"><label for="bk-area">Área</label>
+                  <select id="bk-area" name="area" data-bk-areas><option value="">Selecionar área</option></select></div>
+                <div class="field"><label for="bk-topic">Em poucas linhas, qual é o assunto?</label>
+                  <textarea id="bk-topic" name="topic" rows="3" maxlength="1500" placeholder="Opcional — ajuda-nos a preparar a reunião."></textarea></div>
+              </div>
+              <div class="bk__foot">
+                <button type="button" class="bk__back" data-bk-back>Voltar</button>
+                <button class="btn" type="submit"><span class="btn__label">Rever e pagar</span><span class="btn__icon"><svg aria-hidden="true"><use href="#arrow"/></svg></span></button>
+              </div>
+            </form>
+
+            <!-- 4 · Pagamento -->
+            <div class="bk__step" data-bk-step="4">
+              <h3 class="bk__title">Confirme e pague</h3>
+              <dl class="bk__review" data-bk-review></dl>
+              <p class="bk__secure"><svg aria-hidden="true"><use href="#i-lock"/></svg>Pagamento seguro processado pelo Stripe. O horário fica reservado durante o pagamento.</p>
+              <div class="bk__foot">
+                <button type="button" class="bk__back" data-bk-back>Voltar</button>
+                <button class="btn" type="button" data-bk-pay><span class="btn__label">Pagar <span data-bk-total></span></span><span class="btn__icon"><svg aria-hidden="true"><use href="#arrow"/></svg></span></button>
+              </div>
+            </div>
+
+            <!-- Resultado -->
+            <div class="bk__step bk__done" data-bk-step="done">
+              <svg class="bk__done-mono" aria-hidden="true"><use href="#mono"/></svg>
+              <h3 class="bk__title" data-bk-done-title>A confirmar o pagamento…</h3>
+              <p class="bk__hint" data-bk-done-text>Um momento, por favor.</p>
+              <div class="bk__foot bk__foot--center"><button type="button" class="bk__back" data-bk-restart hidden>Fazer outra marcação</button></div>
+            </div>
+
+            <p class="bk__error" role="alert" data-bk-error></p>
+          </div>
+
+          <!-- Resumo -->
+          <aside class="bk__summary" aria-label="Resumo da marcação">
+            <p class="eyebrow">Resumo</p>
+            <dl>
+              <div><dt>Data</dt><dd data-bk-sum="date">—</dd></div>
+              <div><dt>Hora</dt><dd data-bk-sum="time">—</dd></div>
+              <div><dt>Formato</dt><dd data-bk-sum="mode">—</dd></div>
+            </dl>
+            <div class="bk__total"><span>Total</span><strong data-bk-sum="total">—</strong></div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ─────────── Contactos ─────────── -->
   <section class="contact" id="contactos">
     <div class="wrap">
-      <p class="eyebrow" data-reveal><span class="num">03</span>Contactos</p>
+      <p class="eyebrow" data-reveal><span class="num" data-contact-num>03</span>Contactos</p>
       <h2 class="display display--xl" data-lines>
         <span class="line"><span>Vamos</span></span>
         <span class="line"><span><em>conversar.</em></span></span>
@@ -326,6 +446,7 @@
   </footer>
 </div>
 
+<script src="assets/js/booking.js" defer></script>
 <script src="assets/js/main.js" defer></script>
 </body>
 </html>
