@@ -97,7 +97,8 @@ button,input,select,textarea{font:inherit;color:inherit}
 .table{width:100%;border-collapse:collapse;font-size:.875rem}
 .table th{padding:.75rem 1rem;text-align:left;font-weight:400;font-size:.6875rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--rule)}
 .table td{padding:1rem;border-bottom:1px solid var(--rule)}
-.badge{display:inline-block;padding:.2rem .65rem;border-radius:999px;background:rgba(98,106,67,.1);color:var(--olive-deep);font-size:.75rem}
+.badge{display:inline-flex;align-items:center;align-self:center;gap:.4rem;flex:none;width:fit-content;height:fit-content;padding:.28rem .75rem .28rem .6rem;border-radius:999px;background:rgba(98,106,67,.1);color:var(--olive-deep);font-size:.75rem;font-weight:500;line-height:1.2;letter-spacing:.01em;white-space:nowrap}
+.badge::before{content:"";width:.4rem;height:.4rem;border-radius:50%;background:currentColor;opacity:.75}
 .badge--off{background:var(--soft);color:var(--muted)}
 .section-title{margin:2.5rem 0 1rem;font:400 1.35rem/1.2 var(--serif);color:var(--olive)}
 .menu-toggle{display:none}
@@ -299,3 +300,45 @@ fieldset.mode .check input{margin-top:.2rem}
 .skeleton__panel{height:18rem}
 @keyframes skel{to{background-position:-200% 0}}
 @media (prefers-reduced-motion:reduce){.skeleton__bar,.skeleton__card,.skeleton__panel{animation:none}}
+
+/* ── Calendário de consultas ─────────────────────────────────────────── */
+.cal{padding:1.5rem 1.5rem 1.25rem}
+.cal__head{display:flex;align-items:baseline;flex-wrap:wrap;gap:.4rem 1.25rem;margin-bottom:1.25rem}
+.cal__title{font:400 1.75rem/1.1 var(--serif);color:var(--olive);text-transform:capitalize}
+.cal__title span{color:var(--muted)}
+.cal__nav{display:flex;align-items:center;gap:.4rem;margin-left:auto}
+.cal__arrow{display:grid;place-items:center;width:2.25rem;height:2.25rem;border:1px solid var(--rule);border-radius:50%;font-size:1.2rem;line-height:1;color:var(--olive);transition:border-color .2s,background .2s}
+.cal__arrow:hover{border-color:var(--olive);background:rgba(98,106,67,.06)}
+.cal__grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-top:1px solid var(--rule);border-left:1px solid var(--rule)}
+.cal__dow{padding:.55rem .6rem;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);font-size:.6875rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.cal__cell{display:flex;flex-direction:column;gap:.3rem;min-height:7.25rem;padding:.45rem .45rem .55rem;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);min-width:0}
+.cal__cell--out{background:repeating-linear-gradient(135deg,transparent 0 6px,rgba(98,106,67,.035) 6px 7px)}
+.cal__cell.is-weekend{background:rgba(98,106,67,.025)}
+.cal__day{align-self:flex-start;display:grid;place-items:center;min-width:1.7rem;height:1.7rem;padding:0 .3rem;border-radius:999px;font-size:.8125rem;color:var(--ink)}
+.cal__cell.is-past .cal__day{color:var(--muted)}
+.cal__cell.is-today .cal__day{background:var(--olive);color:var(--ivory)}
+.cal__ev{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.4rem;padding:.35rem .5rem;min-width:0;border-radius:8px;border-left:3px solid var(--olive);background:rgba(98,106,67,.1);font-size:.75rem;line-height:1.3;color:var(--ink);transition:background .2s}
+a.cal__ev:hover{background:rgba(98,106,67,.18)}
+.cal__ev--online{border-left-color:#8C9466;background:rgba(140,148,102,.14)}
+.cal__ev--pendente{border-left-style:dashed;border-left-color:#B07D28;background:rgba(176,125,40,.1)}
+.cal__ev--conflito{border-left-color:var(--danger);background:rgba(155,59,46,.08)}
+.cal__cell.is-past .cal__ev{opacity:.6}
+.cal__time{font-weight:600;font-variant-numeric:tabular-nums}
+.cal__meta{order:1;color:var(--muted);font-size:.6875rem}
+.cal__name{order:2;flex:1 0 100%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cal__legend{display:flex;flex-wrap:wrap;gap:1.25rem;margin-top:1rem}
+.cal__legend span{display:inline-flex;align-items:center;gap:.45rem}
+.cal__dot{width:.6rem;height:.6rem;border-radius:3px;background:var(--olive)}
+.cal__dot--online{background:#8C9466}
+.cal__dot--pendente{background:#B07D28}
+/* Telemóvel: lista dos dias com consultas, em vez da grelha */
+@media (max-width:760px){
+  .cal{padding:1.1rem}
+  .cal__grid{display:flex;flex-direction:column;border:0}
+  .cal__dow,.cal__cell--out,.cal__cell:not(.has-ev){display:none}
+  .cal__cell{flex-direction:row;flex-wrap:wrap;align-items:flex-start;min-height:0;padding:.75rem 0;border-right:0;background:none}
+  .cal__cell.is-weekend{background:none}
+  .cal__day{min-width:2.2rem;height:2.2rem;font-size:.9375rem;margin-right:.5rem}
+  .cal__ev{flex:1 1 calc(100% - 3rem);margin-left:0}
+  .cal__ev+.cal__ev{margin-left:2.7rem}
+}

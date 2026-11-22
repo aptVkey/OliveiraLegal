@@ -10,6 +10,7 @@ import { SubmitButton } from '@/components/submit-button'
 import { Badge, Empty, PageHead } from '@/components/ui'
 import { cancelBooking, resendBookingEmails } from './actions'
 import { BOOKING_STATUS } from './labels'
+import { BookingCalendar } from './calendar'
 
 export const metadata: Metadata = { title: 'Agendamentos' }
 
@@ -18,6 +19,7 @@ const VIEWS = {
   pendentes: { label: 'Por concluir', status: ['rascunho', 'pendente', 'expirado'] },
   passadas: { label: 'Realizadas', status: ['pago'] },
   canceladas: { label: 'Canceladas', status: ['cancelado'] },
+  calendario: { label: 'Calendário', status: [] },
 } as const
 type View = keyof typeof VIEWS
 
@@ -28,9 +30,9 @@ type Row = {
   area: { name: string } | null
 }
 
-export default async function Agendamentos({ searchParams }: { searchParams: Promise<{ ver?: string }> }) {
+export default async function Agendamentos({ searchParams }: { searchParams: Promise<{ ver?: string; mes?: string }> }) {
   const me = await requireMember()
-  const { ver } = await searchParams
+  const { ver, mes } = await searchParams
   const view: View = ver && ver in VIEWS ? (ver as View) : 'proximas'
   const db = await createClient()
   const now = new Date().toISOString()
@@ -44,7 +46,7 @@ export default async function Agendamentos({ searchParams }: { searchParams: Pro
   else q = q.order('created_at', { ascending: false })
 
   const [{ data }, { data: settings }, { count: upcoming }, { data: monthPaid }, { count: abandoned }] = await Promise.all([
-    q,
+    view === 'calendario' ? Promise.resolve({ data: [] }) : q,
     db.from('booking_settings').select('enabled').eq('id', 1).maybeSingle(),
     db.from('bookings').select('id', { count: 'exact', head: true }).in('status', ['pago', 'conflito']).gte('starts_at', now),
     db.from('bookings').select('amount_cents').in('status', ['pago', 'conflito']).gte('paid_at', monthStart),
@@ -89,7 +91,9 @@ export default async function Agendamentos({ searchParams }: { searchParams: Pro
         </nav>
       </div>
 
-      {!rows.length ? (
+      {view === 'calendario' ? (
+        <BookingCalendar mes={mes} />
+      ) : !rows.length ? (
         <Empty title={view === 'proximas' ? 'Sem consultas marcadas' : 'Nada por aqui'}>
           {view === 'proximas' ? 'As consultas pagas no site aparecem aqui e na lead correspondente.' : ''}
         </Empty>
