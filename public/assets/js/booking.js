@@ -292,7 +292,8 @@
 
     // Mostrar a secção e apontar "Marcar consulta" para aqui
     root.hidden = false;
-    const cn = document.querySelector('[data-contact-num]'); if (cn) cn.textContent = '04';
+    const fn = document.querySelector('[data-faq-num]'); if (fn) fn.textContent = '04';
+    const cn = document.querySelector('[data-contact-num]'); if (cn) cn.textContent = '05';
     document.querySelectorAll('.nav__cta').forEach((a) => a.setAttribute('href', '#agendar'));
     if ('ResizeObserver' in window) { let t; new ResizeObserver(() => { clearTimeout(t); t = setTimeout(relayout, 150); }).observe(root); }
 
