@@ -288,3 +288,14 @@ fieldset.mode .check input{margin-top:.2rem}
 .note__editor[open]{flex-basis:100%}
 .note__editor[open] summary{margin-bottom:.6rem}
 .note__delete{background:none;border:0;padding:0;font-size:.75rem;color:var(--muted);cursor:pointer}
+
+/* Esqueleto de carregamento do backoffice */
+.skeleton{display:flex;flex-direction:column;gap:1.25rem}
+.skeleton__bar,.skeleton__card,.skeleton__panel{border-radius:10px;background:linear-gradient(90deg,rgba(98,106,67,.06),rgba(98,106,67,.13),rgba(98,106,67,.06));background-size:200% 100%;animation:skel 1.4s linear infinite}
+.skeleton__bar--title{height:2.25rem;width:min(18rem,60%)}
+.skeleton__bar--sub{height:1rem;width:min(26rem,80%)}
+.skeleton__grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:1rem;margin-top:.5rem}
+.skeleton__card{height:5.5rem}
+.skeleton__panel{height:18rem}
+@keyframes skel{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.skeleton__bar,.skeleton__card,.skeleton__panel{animation:none}}
