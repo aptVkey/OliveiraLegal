@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { requireSocio, type Member } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/server'
+import { authRedirect } from '@/lib/site'
 import { createAdminClient, isAdminConfigured } from '@/lib/supabase/admin'
 import { bool, dbError, num, str, type FormState } from '@/lib/forms'
 import { passwordProblem } from '@/lib/password'
@@ -73,7 +74,7 @@ export async function createMember(_: FormState, fd: FormData): Promise<FormStat
     if (error || !data.user) return { error: adminError(error) }
     userId = data.user.id
   } else {
-    const { data, error } = await admin.auth.admin.inviteUserByEmail(p.email!, { data: { full_name: p.full_name } })
+    const { data, error } = await admin.auth.admin.inviteUserByEmail(p.email!, { data: { full_name: p.full_name }, redirectTo: await authRedirect() })
     if (error || !data.user) return { error: adminError(error) }
     userId = data.user.id
   }
@@ -128,7 +129,7 @@ export async function sendPasswordReset(_: FormState, fd: FormData): Promise<For
   const { data, error } = await createAdminClient().auth.admin.getUserById(id)
   if (error || !data.user?.email) return { error: adminError(error) }
   const db = await createClient()
-  const { error: e2 } = await db.auth.resetPasswordForEmail(data.user.email)
+  const { error: e2 } = await createAdminClient().auth.resetPasswordForEmail(data.user.email, { redirectTo: await authRedirect() })
   if (e2) return { error: adminError(e2) }
   return { ok: true, message: `Link de nova palavra-passe enviado para ${data.user.email}.` }
 }
@@ -141,7 +142,7 @@ export async function resendInvite(_: FormState, fd: FormData): Promise<FormStat
   const { data, error } = await admin.auth.admin.getUserById(id)
   if (error || !data.user?.email) return { error: adminError(error) }
   if (data.user.last_sign_in_at) return { error: 'Este membro já aceitou o convite.' }
-  const { error: e2 } = await admin.auth.admin.inviteUserByEmail(data.user.email)
+  const { error: e2 } = await admin.auth.admin.inviteUserByEmail(data.user.email, { redirectTo: await authRedirect() })
   if (e2) return { error: adminError(e2) }
   return { ok: true, message: `Convite reenviado para ${data.user.email}.` }
 }
