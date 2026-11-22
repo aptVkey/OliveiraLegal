@@ -23,11 +23,13 @@ export default async function Tarefas({ searchParams }: { searchParams: Promise<
     .order('created_at', { ascending: false })
   if (vista === 'minhas') query = query.eq('assignee_id', me.id)
   query = estado === 'concluidas' ? query.eq('status', 'concluida') : query.neq('status', 'concluida')
-  const [{ data: tasks }, members, cases] = await Promise.all([query.limit(300), getMembers(), getOpenCasesLite()])
-
-  const ids = (tasks ?? []).map(t => t.id)
-  const [{ data: tt }, { data: running }] = await Promise.all([
-    ids.length ? db.from('task_totals').select('*').in('task_id', ids) : Promise.resolve({ data: [] as any[] }),
+  const tasksQ = query.limit(300).then(r => r)
+  const [{ data: tasks }, members, cases, { data: tt }, { data: running }] = await Promise.all([
+    tasksQ, getMembers(), getOpenCasesLite(),
+    (async () => {
+      const ids = ((await tasksQ).data ?? []).map(t => t.id)
+      return { data: ids.length ? ((await db.from('task_totals').select('*').in('task_id', ids)).data ?? []) as any[] : [] }
+    })(),
     db.from('time_entries').select('task_id').eq('member_id', me.id).is('ended_at', null).maybeSingle(),
   ])
   const totals: Record<string, TaskTotal> = Object.fromEntries((tt ?? []).map(t => [t.task_id, { minutes: t.minutes, amount: Number(t.amount), cost: Number(t.cost) }]))

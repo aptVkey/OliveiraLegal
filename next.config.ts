@@ -8,8 +8,13 @@ const security = [
   { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
 ]
 
+// Cache do site estático: fontes nunca mudam de conteúdo; imagens raramente;
+// CSS/JS podem mudar a cada deploy, por isso o browser revalida em segundo plano.
+const cache = (value: string) => [{ key: 'Cache-Control', value }]
+
 const nextConfig: NextConfig = {
   devIndicators: false,
+  poweredByHeader: false,
   // O site público continua a ser o HTML estático em public/index.html
   async rewrites() {
     return { beforeFiles: [{ source: '/', destination: '/index.html' }], afterFiles: [], fallback: [] }
@@ -17,6 +22,10 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       { source: '/:path*', headers: security },
+      { source: '/assets/fonts/:file*', headers: cache('public, max-age=31536000, immutable') },
+      { source: '/assets/img/:file*', headers: cache('public, max-age=2592000, stale-while-revalidate=604800') },
+      { source: '/assets/brand/:file*', headers: cache('public, max-age=604800, stale-while-revalidate=604800') },
+      { source: '/assets/(css|js)/:file*', headers: cache('public, max-age=300, stale-while-revalidate=86400') },
       { source: '/login', headers: noindex },
       { source: '/backoffice/:path*', headers: noindex },
       { source: '/backoffice', headers: noindex },

@@ -24,13 +24,11 @@ export default async function Clientes({ searchParams }: { searchParams: Promise
     .eq('archived', archived).order('name')
   const term = q.replace(/[%,()]/g, '')
   if (term) query = query.or(`name.ilike.%${term}%,nif.ilike.%${term}%,email.ilike.%${term}%`)
-  const { data: clients } = await query
+  // Lista e totais em paralelo (os totais são poucos e filtrados aqui para os clientes listados)
+  const [{ data: clients }, { data: totalsRows }] = await Promise.all([query, db.from('client_totals').select('*')])
 
-  const ids = (clients ?? []).map(c => c.id)
-  const { data: totalsRows } = ids.length
-    ? await db.from('client_totals').select('*').in('client_id', ids)
-    : { data: [] as any[] }
-  const totals = new Map<string, Totals>((totalsRows ?? []).map(t => [t.client_id, t]))
+  const ids = new Set((clients ?? []).map(c => c.id))
+  const totals = new Map<string, Totals>((totalsRows ?? []).filter(t => ids.has(t.client_id)).map(t => [t.client_id, t]))
   const sum = (k: keyof Totals) => [...totals.values()].reduce((s, t) => s + Number(t[k] ?? 0), 0)
   const qs = (extra: string) => [extra, q && `q=${encodeURIComponent(q)}`].filter(Boolean).join('&')
 

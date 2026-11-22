@@ -21,27 +21,29 @@ export default async function CasoPage({ params }: { params: Promise<{ id: strin
   const me = await requireMember()
   const { id } = await params
   const db = await createClient()
-  const { data: k } = await db.from('cases')
-    .select('*, client:clients(id, name), area:practice_areas(name), responsible:profiles!cases_responsible_id_fkey(full_name)')
-    .eq('id', id).maybeSingle()
-  if (!k) notFound()
-
-  const [{ data: team }, { data: tasks }, { data: entries }, members, clients, areas] = await Promise.all([
+  // Tudo em paralelo (os totais das tarefas seguem logo que a lista de tarefas chega)
+  const tasksQ = db.from('tasks').select('id, title, status, priority, due_date, assignee_id, assignee:profiles!tasks_assignee_id_fkey(full_name)')
+    .eq('case_id', id).order('status').order('due_date', { nullsFirst: false })
+    .then(r => r)
+  const [{ data: k }, { data: team }, { data: tasks }, { data: entries }, members, clients, areas, { data: ct }, { data: tt }, { data: running }] = await Promise.all([
+    db.from('cases')
+      .select('*, client:clients(id, name), area:practice_areas(name), responsible:profiles!cases_responsible_id_fkey(full_name)')
+      .eq('id', id).maybeSingle(),
     db.from('case_members').select('member_id, member:profiles(full_name, role)').eq('case_id', id),
-    db.from('tasks').select('id, title, status, priority, due_date, assignee_id, assignee:profiles!tasks_assignee_id_fkey(full_name)')
-      .eq('case_id', id).order('status').order('due_date', { nullsFirst: false }),
+    tasksQ,
     db.from('time_entries').select('id, started_at, minutes, billable, amount, cost_amount, status, description, task:tasks(title), member:profiles!time_entries_member_id_fkey(full_name)')
       .eq('case_id', id).not('ended_at', 'is', null).order('started_at', { ascending: false }).limit(200),
     getMembers(), getClientsLite(), getAreas(),
-  ])
-
-  const manager = CAN.billing(me.role)
-  const taskIds = (tasks ?? []).map(t => t.id)
-  const [{ data: ct }, { data: tt }, { data: running }] = await Promise.all([
     db.from('case_totals').select('*').eq('case_id', id).maybeSingle(),
-    taskIds.length ? db.from('task_totals').select('*').in('task_id', taskIds) : Promise.resolve({ data: [] as any[] }),
+    (async () => {
+      const ids = ((await tasksQ).data ?? []).map(t => t.id)
+      return { data: ids.length ? ((await db.from('task_totals').select('*').in('task_id', ids)).data ?? []) as any[] : [] }
+    })(),
     db.from('time_entries').select('task_id').eq('member_id', me.id).is('ended_at', null).maybeSingle(),
   ])
+  if (!k) notFound()
+
+  const manager = CAN.billing(me.role)
   const taskTotals: Record<string, TaskTotal> = Object.fromEntries((tt ?? []).map(t => [t.task_id, { minutes: t.minutes, amount: Number(t.amount), cost: Number(t.cost) }]))
   const billMin = ct?.billable_minutes ?? 0
   const nonBillMin = ct?.nonbillable_minutes ?? 0

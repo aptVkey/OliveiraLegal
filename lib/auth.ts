@@ -20,22 +20,27 @@ export const getMember = cache(async (): Promise<Member | null> => {
   await connection() // nunca pré-renderizar páginas protegidas
   if (!isSupabaseConfigured) return null
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return null
+  // getClaims verifica a assinatura do token (chaves assimétricas: localmente, sem ida ao servidor de Auth;
+  // chave simétrica: confirma no servidor). O estado "ativo" é sempre confirmado na base de dados abaixo,
+  // por isso um membro desativado perde o acesso no pedido seguinte.
+  const { data } = await supabase.auth.getClaims()
+  const claims = data?.claims
+  if (!claims?.sub) return null
   const { data: profile } = await supabase
     .from('profiles')
     .select('full_name, role, active')
-    .eq('id', user.id)
+    .eq('id', claims.sub)
     .single()
   if (!profile || !profile.active) return null
+  const email = typeof claims.email === 'string' ? claims.email : ''
   return {
-    id: user.id,
-    email: user.email ?? '',
-    fullName: profile.full_name || user.email || '',
+    id: claims.sub,
+    email,
+    fullName: profile.full_name || email,
     role: profile.role as Role,
     active: profile.active,
     // Definido só pelo servidor (app_metadata) quando um sócio cria a conta com palavra-passe inicial
-    mustChangePassword: user.app_metadata?.must_change_password === true,
+    mustChangePassword: (claims.app_metadata as Record<string, unknown> | undefined)?.must_change_password === true,
   }
 })
 

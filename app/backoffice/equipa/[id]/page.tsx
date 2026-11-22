@@ -21,13 +21,14 @@ export default async function EditarUtilizador({ params, searchParams }: {
   const { id } = await params
   const { criado } = await searchParams
   const db = await createClient()
-  const [{ data: m }, { count: entries }] = await Promise.all([
+  const [{ data: m }, { count: entries }, { data: rates }, u] = await Promise.all([
     db.from('profiles').select('id, full_name, role, hourly_rate, cost_rate, active, created_at').eq('id', id).maybeSingle(),
     db.from('time_entries').select('id', { count: 'exact', head: true }).eq('member_id', id),
+    db.from('role_rates').select('role, hourly_rate'),
+    isAdminConfigured ? createAdminClient().auth.admin.getUserById(id).then(r => r.data.user) : Promise.resolve(null),
   ])
   if (!m) notFound()
-  const { data: rate } = await db.from('role_rates').select('hourly_rate').eq('role', m.role).maybeSingle()
-  const u = isAdminConfigured ? (await createAdminClient().auth.admin.getUserById(id)).data.user : null
+  const rate = (rates ?? []).find(r => r.role === m.role)
   const pending = !!u && !u.last_sign_in_at
   const self = m.id === me.id
 

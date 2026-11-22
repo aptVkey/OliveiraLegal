@@ -172,7 +172,8 @@
     }
 
     // Cursor
-    if (cursorOn) {
+    // (só escreve no DOM enquanto o cursor se move — em repouso o ciclo não toca na página)
+    if (cursorOn && (Math.abs(cx - mx) > 0.05 || Math.abs(cy - my) > 0.05)) {
       cx = lerp(cx, mx, k(14)); cy = lerp(cy, my, k(14));
       cursor.style.transform = `translate3d(${cx.toFixed(1)}px,${cy.toFixed(1)}px,0)`;
     }

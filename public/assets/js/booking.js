@@ -320,5 +320,8 @@
     } else go(1, { silent: true });
   }
 
-  init();
+  // Não compete com o carregamento inicial: arranca quando o browser estiver livre
+  // (logo de imediato no regresso do pagamento)
+  if (/[?&]agendamento=/.test(location.search) || !('requestIdleCallback' in window)) setTimeout(init, 0);
+  else requestIdleCallback(init, { timeout: 2500 });
 })();

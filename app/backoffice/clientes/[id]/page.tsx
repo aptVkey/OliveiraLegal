@@ -22,20 +22,23 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
   const canTeam = ['socio', 'advogado', 'associado'].includes(me.role)
   const { id } = await params
   const db = await createClient()
-  const [{ data: client }, { data: cases }, { data: team }, { data: totals }, members, { data: notes }] = await Promise.all([
+  const casesQ = db.from('cases').select('id, reference, title, status, opened_at, responsible:profiles!cases_responsible_id_fkey(full_name)')
+    .eq('client_id', id).order('opened_at', { ascending: false }).then(r => r)
+  const [{ data: client }, { data: cases }, { data: team }, { data: totals }, members, { data: notes }, { data: caseTotals }] = await Promise.all([
     db.from('clients').select('*').eq('id', id).maybeSingle(),
-    db.from('cases').select('id, reference, title, status, opened_at, responsible:profiles!cases_responsible_id_fkey(full_name)')
-      .eq('client_id', id).order('opened_at', { ascending: false }),
+    casesQ,
     db.from('client_members').select('member_id, member:profiles(full_name, role)').eq('client_id', id),
     db.from('client_totals').select('*').eq('client_id', id).maybeSingle(),
     getMembers(),
     db.from('notes').select('id, body, kind, created_at, edited_at, author_id, lead_id, author:profiles(full_name)')
       .eq('client_id', id).order('created_at', { ascending: false }),
+    (async () => {
+      const ids = ((await casesQ).data ?? []).map(k => k.id)
+      return { data: ids.length ? ((await db.from('case_totals').select('*').in('case_id', ids)).data ?? []) as any[] : [] }
+    })(),
   ])
   if (!client) notFound()
 
-  const caseIds = (cases ?? []).map(k => k.id)
-  const { data: caseTotals } = caseIds.length ? await db.from('case_totals').select('*').in('case_id', caseIds) : { data: [] as any[] }
   const ct = new Map((caseTotals ?? []).map(t => [t.case_id, t]))
   const teamIds = new Set((team ?? []).map(t => t.member_id))
   const amount = Number(totals?.amount ?? 0), cost = Number(totals?.cost ?? 0)
