@@ -311,12 +311,23 @@
         if (!ok && !first) first = inp;
       });
       if (first) { status.textContent = 'Por favor, confirme os campos assinalados.'; first.focus({ preventScroll: false }); return; }
-      const d = new FormData(form), to = (form.dataset.email || '').trim();
-      if (!to) { status.textContent = 'Obrigado. O envio ficará ativo assim que o e-mail do escritório for configurado.'; return; }
-      const subject = `Pedido de contacto — ${d.get('assunto') || 'Geral'}`;
-      const body = `Nome: ${d.get('nome')}\nE-mail: ${d.get('email')}\n\n${d.get('mensagem')}`;
-      window.location.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      status.textContent = 'A abrir a sua aplicação de e-mail para concluir o envio.';
+      const d = new FormData(form), btn = $('button[type="submit"]', form);
+      if (form.dataset.busy) return;
+      form.dataset.busy = '1'; btn && (btn.disabled = true);
+      status.textContent = 'A enviar…';
+      fetch('/api/contacto', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: d.get('nome'), email: d.get('email'), subject: d.get('assunto'), message: d.get('mensagem'),
+          consent: !!d.get('consentimento'), website: d.get('website') || ''
+        })
+      }).then(r => r.json().catch(() => ({})).then(j => ({ ok: r.ok, j })))
+        .then(({ ok, j }) => {
+          if (ok && j.ok) { form.reset(); status.textContent = 'Mensagem enviada. Enviámos-lhe um e-mail de confirmação e responderemos em breve.'; }
+          else status.textContent = j.error || 'Não foi possível enviar. Tente novamente ou escreva-nos por e-mail.';
+        })
+        .catch(() => { status.textContent = 'Sem ligação. Tente novamente dentro de instantes.'; })
+        .finally(() => { delete form.dataset.busy; btn && (btn.disabled = false); });
     });
   }
 

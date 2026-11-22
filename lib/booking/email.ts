@@ -180,3 +180,48 @@ export async function sendBookingEmails(c: EmailContext): Promise<{ client: bool
   ])
   return { client, office: officeOk }
 }
+
+// ── Formulário de contacto do site ───────────────────────────────────────
+const CONTACT_TO = process.env.CONTACT_EMAIL_TO ?? 'geral@oliveiralegal.com'
+
+export async function sendContactEmails(c: { name: string; email: string; subject: string; message: string }): Promise<{ client: boolean; office: boolean }> {
+  if (!isEmailConfigured) return { client: false, office: false }
+  const first = c.name.trim().split(/\s+/)[0]
+  const subj = c.subject || 'Assunto geral'
+
+  const officeHtml = shell({
+    title: 'Novo pedido de contacto',
+    preheader: `${c.name} · ${subj}`,
+    body: `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 22px;border-top:1px solid ${C.rule}">
+       ${row('Nome', h(c.name))}
+       ${row('E-mail', `<a href="mailto:${h(c.email)}" style="color:${C.olive}">${h(c.email)}</a>`)}
+       ${row('Assunto', h(subj))}
+     </table>
+     <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:${C.muted};margin-bottom:8px">Mensagem</div>
+     <div style="padding:18px 20px;background:${C.ivory};border:1px solid ${C.rule};border-radius:14px;font:400 16px/1.65 ${SERIF};color:${C.ink}">${nl(c.message)}</div>
+     <p style="margin:24px 0 0">${button(`mailto:${c.email}?subject=${encodeURIComponent('Re: ' + subj)}`, 'Responder')}</p>`,
+    footer: 'Este pedido foi guardado como lead (origem: website) no backoffice. Basta responder a este e-mail para escrever diretamente à pessoa.',
+  })
+
+  const clientHtml = shell({
+    title: 'Recebemos a sua mensagem',
+    preheader: 'Responderemos com a brevidade possível.',
+    body: `<p style="margin:0 0 16px">Olá ${h(first)},</p>
+     <p style="margin:0 0 22px">Obrigado por nos contactar. Recebemos a sua mensagem e responderemos com a brevidade possível para agendar uma primeira conversa.</p>
+     <div style="font:italic 400 19px/1.3 ${SERIF};color:${C.olive};margin-bottom:8px">A sua mensagem</div>
+     <div style="padding:16px 20px;background:${C.ivory};border:1px solid ${C.rule};border-radius:14px;font-size:14px;line-height:1.65;color:${C.ink}">
+       <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:${C.muted};margin-bottom:6px">${h(subj)}</div>${nl(c.message)}</div>
+     <p style="margin:24px 0 0;font-size:14px">Se preferir, pode marcar já uma consulta no nosso site.</p>
+     <p style="margin:12px 0 0">${button(`${SITE}/#agendar`, 'Marcar consulta')}</p>`,
+    footer: `Este e-mail é uma confirmação automática. Pode responder-lhe se quiser acrescentar algo.<br>
+      Os seus dados são tratados com confidencialidade e apenas para responder a este pedido.`,
+  })
+
+  const clientText = `Olá ${first},\n\nObrigado por nos contactar. Recebemos a sua mensagem e responderemos com a brevidade possível.\n\nA sua mensagem (${subj}):\n${c.message}\n\nOliveira Legal · Albufeira`
+
+  const [client, office] = await Promise.all([
+    send({ from, to: [c.email], reply_to: CONTACT_TO, subject: 'Recebemos a sua mensagem · Oliveira Legal', html: clientHtml, text: clientText }),
+    send({ from, to: [CONTACT_TO], reply_to: c.email, subject: `Novo contacto · ${c.name} · ${subj}`, html: officeHtml }),
+  ])
+  return { client, office }
+}
