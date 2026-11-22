@@ -319,12 +319,12 @@ main{position:relative;z-index:2;background:var(--ivory);overflow-x:clip}
 
 /* ── Agendar ────────────────────────────────────────────────────────────── */
 /* Secção em verde: as cores da marca invertem-se apenas aqui dentro */
-.book{--olive:#F3EFE5;--ivory:#7C8462;--rule:rgba(243,239,229,.34);--rule-inv:rgba(98,106,67,.26);position:relative;background:#7C8462;color:var(--olive);padding-block:var(--section);margin-top:var(--section)}
+.book{--olive:#F3EFE5;--ivory:#626A43;--rule:rgba(243,239,229,.28);--rule-inv:rgba(98,106,67,.26);position:relative;background:#626A43;color:var(--olive);padding-block:var(--section);margin-top:var(--section)}
 .book .bk{--err:#f2c4a8}
 .book .bk__skeleton{background:linear-gradient(90deg,rgba(243,239,229,.06),rgba(243,239,229,.14),rgba(243,239,229,.06));background-size:200% 100%}
 .book .bk__mode[aria-checked="true"]{background:rgba(243,239,229,.1)}
 .book .book__intro,.book .bk__hint,.book .bk__secure{opacity:.95}
-@media (max-width:760px){.book .bk__foot{background:linear-gradient(to bottom,rgba(124,132,98,0),#7C8462 1.25rem)}}
+@media (max-width:760px){.book .bk__foot{background:linear-gradient(to bottom,rgba(98,106,67,0),#626A43 1.25rem)}}
 .book input:-webkit-autofill,.book textarea:-webkit-autofill{-webkit-text-fill-color:#F3EFE5;transition:background-color 9999s}
 .book[hidden]{display:none}
 .book__head{display:grid;grid-template-columns:repeat(12,1fr);column-gap:1.5rem;row-gap:1.75rem;align-items:end;margin-top:clamp(2rem,4vw,3.5rem)}
