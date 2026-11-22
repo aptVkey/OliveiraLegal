@@ -12,6 +12,7 @@ export type Member = {
   fullName: string
   role: Role
   active: boolean
+  mustChangePassword: boolean
 }
 
 // Verificação no servidor, em cada página do backoffice (não depende só do proxy).
@@ -33,11 +34,22 @@ export const getMember = cache(async (): Promise<Member | null> => {
     fullName: profile.full_name || user.email || '',
     role: profile.role as Role,
     active: profile.active,
+    // Definido só pelo servidor (app_metadata) quando um sócio cria a conta com palavra-passe inicial
+    mustChangePassword: user.app_metadata?.must_change_password === true,
   }
 })
 
 export async function requireMember(): Promise<Member> {
   const member = await getMember()
-  if (!member) redirect('/login')
+  // ?erro evita um ciclo /login ↔ /backoffice quando há sessão mas a conta está inativa
+  if (!member) redirect('/login?erro=acesso')
+  if (member.mustChangePassword) redirect('/definir-palavra-passe')
+  return member
+}
+
+// Sócio confirmado na base de dados a cada pedido (não confia no que vem do browser)
+export async function requireSocio(): Promise<Member> {
+  const member = await requireMember()
+  if (member.role !== 'socio') throw new Error('Só um sócio pode gerir utilizadores.')
   return member
 }

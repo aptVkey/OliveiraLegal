@@ -9,6 +9,7 @@ const security = [
 ]
 
 const nextConfig: NextConfig = {
+  devIndicators: false,
   // O site público continua a ser o HTML estático em public/index.html
   async rewrites() {
     return { beforeFiles: [{ source: '/', destination: '/index.html' }], afterFiles: [], fallback: [] }
@@ -19,6 +20,9 @@ const nextConfig: NextConfig = {
       { source: '/login', headers: noindex },
       { source: '/backoffice/:path*', headers: noindex },
       { source: '/backoffice', headers: noindex },
+      { source: '/auth/:path*', headers: noindex },
+      { source: '/definir-palavra-passe', headers: noindex },
+      { source: '/recuperar', headers: noindex },
     ]
   },
 }

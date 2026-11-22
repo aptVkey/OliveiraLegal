@@ -33,7 +33,7 @@ export async function updateSession(request: NextRequest) {
     url.searchParams.set('next', pathname)
     return NextResponse.redirect(url)
   }
-  if (pathname === '/login' && signedIn) {
+  if (pathname === '/login' && signedIn && !request.nextUrl.searchParams.has('erro')) {
     return NextResponse.redirect(new URL('/backoffice', request.url))
   }
   return response

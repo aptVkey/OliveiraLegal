@@ -3,10 +3,17 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
+import type { Role } from '@/lib/roles'
+import { Elapsed } from '@/components/elapsed'
 import { SECTIONS } from './sections'
 import { signOut } from './actions'
+import { stopTimer } from './tempo/actions'
 
-export function Sidebar({ name, role, children }: { name: string; role: string; children: React.ReactNode }) {
+type Running = { started_at: string; label: string } | null
+
+export function Sidebar({ name, role, roleLabel, running, children }: {
+  name: string; role: Role; roleLabel: string; running: Running; children: React.ReactNode
+}) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   let lastGroup = ''
@@ -22,7 +29,7 @@ export function Sidebar({ name, role, children }: { name: string; role: string; 
           {open ? 'Fechar' : 'Menu'}
         </button>
         <nav className="side__nav" aria-label="Backoffice">
-          {SECTIONS.map(s => {
+          {SECTIONS.filter(s => !s.roles || s.roles.includes(role)).map(s => {
             const href = s.slug ? `/backoffice/${s.slug}` : '/backoffice'
             const active = s.slug ? pathname.startsWith(href) : pathname === href
             const heading = s.group !== lastGroup ? <p className="side__group">{s.group}</p> : null
@@ -39,7 +46,13 @@ export function Sidebar({ name, role, children }: { name: string; role: string; 
           })}
         </nav>
         <div className="side__foot">
-          <div className="side__user"><strong>{name}</strong><span>{role}</span></div>
+          {running && (
+            <div className="side__timer">
+              <Link href="/backoffice/tempo"><b><span className="dot-live" /><Elapsed since={running.started_at} /></b><span>{running.label}</span></Link>
+              <form action={stopTimer}><button type="submit">Parar</button></form>
+            </div>
+          )}
+          <div className="side__user"><strong>{name}</strong><span>{roleLabel}</span></div>
           <form action={signOut}><button className="side__logout" type="submit">Terminar sessão</button></form>
         </div>
       </aside>
