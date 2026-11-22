@@ -4,8 +4,10 @@ import { createHash } from 'node:crypto'
 import { createAdminClient, isAdminConfigured } from '@/lib/supabase/admin'
 
 // Chaves só no servidor (Vercel → Environment Variables). Nunca guardadas na base de dados.
-const stripeKey = process.env.STRIPE_SECRET_KEY ?? ''
-export const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET ?? ''
+// Tolera espaços, quebras de linha ou aspas deixadas ao colar o valor na Vercel
+const clean = (v: string | undefined) => (v ?? '').trim().replace(/^["']+|["']+$/g, '').trim()
+const stripeKey = clean(process.env.STRIPE_SECRET_KEY)
+export const webhookSecret = clean(process.env.STRIPE_WEBHOOK_SECRET)
 export const isStripeConfigured = /^(sk|rk)_(test|live)_/.test(stripeKey)
 export const isWebhookConfigured = webhookSecret.startsWith('whsec_')
 export const stripeMode: 'teste' | 'produção' | null = !isStripeConfigured ? null : stripeKey.includes('_live_') ? 'produção' : 'teste'
