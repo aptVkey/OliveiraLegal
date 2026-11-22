@@ -9,6 +9,7 @@ import { eur, fmtDate } from '@/lib/format'
 import { ActionForm } from '@/components/action-form'
 import { SubmitButton } from '@/components/submit-button'
 import { Badge, BackLink, PageHead } from '@/components/ui'
+import { NotesPanel, type NoteRow } from '../../notas/notes-panel'
 import { convertLead, deleteLead, updateLead } from '../actions'
 import { LeadFields } from '../lead-fields'
 
@@ -18,9 +19,11 @@ export default async function LeadPage({ params }: { params: Promise<{ id: strin
   const me = await requireMember()
   const { id } = await params
   const db = await createClient()
-  const [{ data: lead }, members, areas] = await Promise.all([
+  const [{ data: lead }, members, areas, { data: notes }] = await Promise.all([
     db.from('leads').select('*, area:practice_areas(name), owner:profiles!leads_owner_id_fkey(full_name), client:clients(id, name)').eq('id', id).maybeSingle(),
     getMembers(), getAreas(),
+    db.from('notes').select('id, body, kind, created_at, edited_at, author_id, lead_id, author:profiles(full_name)')
+      .eq('lead_id', id).order('created_at', { ascending: false }),
   ])
   if (!lead) notFound()
 
@@ -60,13 +63,7 @@ export default async function LeadPage({ params }: { params: Promise<{ id: strin
               {lead.client && <><dt>Cliente</dt><dd><Link className="link" href={`/backoffice/clientes/${lead.client.id}`}>{lead.client.name}</Link></dd></>}
             </dl>
           </div>
-          <div className="card">
-            <h2>Conflitos</h2>
-            <p className="small muted">Confirme que não há conflito de interesses antes de aceitar o assunto.</p>
-            <p style={{ marginTop: '.9rem' }}>
-              <Link className="btn btn--ghost btn--sm" href={`/backoffice/conflitos?q=${encodeURIComponent(lead.company || lead.name)}`}>Verificar “{lead.company || lead.name}”</Link>
-            </p>
-          </div>
+          <NotesPanel notes={(notes ?? []) as unknown as NoteRow[]} leadId={lead.id} meId={me.id} isSocio={me.role === 'socio'} />
           {me.role === 'socio' && (
             <form action={deleteLead} className="no-print">
               <input type="hidden" name="id" value={lead.id} />

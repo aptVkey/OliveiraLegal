@@ -10,6 +10,7 @@ import { eur, fmtDate, fmtMinutes } from '@/lib/format'
 import { ActionForm } from '@/components/action-form'
 import { SubmitButton } from '@/components/submit-button'
 import { Badge, BackLink, Empty, PageHead, Stat } from '@/components/ui'
+import { NotesPanel, type NoteRow } from '../../notas/notes-panel'
 import { addClientMember, removeClientMember, toggleArchiveClient, updateClientRecord } from '../actions'
 import { ClientFields } from '../client-fields'
 
@@ -21,13 +22,15 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
   const canTeam = ['socio', 'advogado', 'associado'].includes(me.role)
   const { id } = await params
   const db = await createClient()
-  const [{ data: client }, { data: cases }, { data: team }, { data: totals }, members] = await Promise.all([
+  const [{ data: client }, { data: cases }, { data: team }, { data: totals }, members, { data: notes }] = await Promise.all([
     db.from('clients').select('*').eq('id', id).maybeSingle(),
     db.from('cases').select('id, reference, title, status, opened_at, responsible:profiles!cases_responsible_id_fkey(full_name)')
       .eq('client_id', id).order('opened_at', { ascending: false }),
     db.from('client_members').select('member_id, member:profiles(full_name, role)').eq('client_id', id),
     db.from('client_totals').select('*').eq('client_id', id).maybeSingle(),
     getMembers(),
+    db.from('notes').select('id, body, kind, created_at, edited_at, author_id, lead_id, author:profiles(full_name)')
+      .eq('client_id', id).order('created_at', { ascending: false }),
   ])
   if (!client) notFound()
 
@@ -90,6 +93,8 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
             )}
             <p className="small muted" style={{ marginTop: '1rem' }}>O valor de cada caso é a soma do tempo das suas tarefas e do tempo registado diretamente no caso.</p>
           </div>
+
+          <NotesPanel notes={(notes ?? []) as unknown as NoteRow[]} clientId={client.id} meId={me.id} isSocio={me.role === 'socio'} showOrigin />
 
           <details className="card">
             <summary>Editar dados do cliente</summary>

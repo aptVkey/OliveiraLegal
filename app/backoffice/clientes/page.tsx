@@ -40,7 +40,7 @@ export default async function Clientes({ searchParams }: { searchParams: Promise
         eyebrow="Escritório"
         title="Clientes"
         desc={`${clients?.length ?? 0} ${archived ? 'arquivados' : 'ativos'}`}
-        actions={<><Link className="btn btn--ghost btn--sm" href="/backoffice/conflitos">Verificar conflitos</Link><Link className="btn btn--sm" href="/backoffice/clientes/novo">Novo cliente</Link></>}
+        actions={<Link className="btn btn--sm" href="/backoffice/clientes/novo">Novo cliente</Link>}
       />
 
       {!!clients?.length && (

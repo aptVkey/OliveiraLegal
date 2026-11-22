@@ -30,7 +30,7 @@ export function LeadFields({ lead, members, areas }: {
       <div className="field"><label htmlFor="estimated_value">Valor estimado (€)</label>
         <input id="estimated_value" name="estimated_value" inputMode="decimal" defaultValue={v('estimated_value')} /></div>
       <div className="field"><label htmlFor="lost_reason">Motivo, se perdida</label><input id="lost_reason" name="lost_reason" defaultValue={v('lost_reason')} /></div>
-      <div className="field full"><label htmlFor="notes">Notas</label><textarea id="notes" name="notes" defaultValue={v('notes')} /></div>
+      <div className="field full"><label htmlFor="notes">Resumo do contacto</label><textarea id="notes" name="notes" defaultValue={v('notes')} /></div>
     </>
   )
 }

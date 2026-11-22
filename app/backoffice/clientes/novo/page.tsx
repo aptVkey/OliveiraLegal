@@ -13,7 +13,7 @@ export default async function NovoCliente() {
   return (
     <>
       <BackLink href="/backoffice/clientes">Clientes</BackLink>
-      <PageHead eyebrow="Escritório" title={<>Novo <em>cliente</em></>} desc="Verifique conflitos de interesses antes de abrir um processo." />
+      <PageHead eyebrow="Escritório" title={<>Novo <em>cliente</em></>} />
       <div className="card">
         <ActionForm action={createClientRecord} className="form">
           <ClientFields client={null} />

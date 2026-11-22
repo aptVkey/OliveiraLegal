@@ -61,30 +61,18 @@ export async function moveLead(id: string, stage: string): Promise<FormState> {
   return { ok: true }
 }
 
-// Converte a lead em cliente (sem duplicar se já estiver convertida)
+// Converte a lead em cliente numa só operação na base de dados:
+// cria o cliente e passa para ele todas as notas da lead (sem duplicar se já estiver convertida)
 export async function convertLead(fd: FormData) {
   await requireMember()
   const id = str(fd, 'id')
   if (!id) return
   const db = await createClient()
-  const { data: lead, error } = await db.from('leads').select('*').eq('id', id).single()
-  if (error || !lead) throw new Error(dbError(error))
-  if (lead.client_id) redirect(`/backoffice/clientes/${lead.client_id}`)
-
-  const { data: client, error: e2 } = await db.from('clients').insert({
-    kind: lead.company ? 'empresa' : 'particular',
-    name: lead.company || lead.name,
-    email: lead.email,
-    phone: lead.phone,
-    notes: [lead.company ? `Contacto: ${lead.name}` : null, lead.notes].filter(Boolean).join('\n') || null,
-  }).select('id').single()
-  if (e2) throw new Error(dbError(e2))
-
-  const { error: e3 } = await db.from('leads').update({ client_id: client.id, stage: 'ganho' }).eq('id', id)
-  if (e3) throw new Error(dbError(e3))
+  const { data, error } = await db.rpc('convert_lead', { p_lead: id })
+  if (error || !data) throw new Error(dbError(error))
   revalidatePath('/backoffice/leads')
   revalidatePath('/backoffice/clientes')
-  redirect(`/backoffice/clientes/${client.id}`)
+  redirect(`/backoffice/clientes/${data}`)
 }
 
 export async function deleteLead(fd: FormData) {

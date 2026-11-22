@@ -20,7 +20,7 @@ export default async function NovoCaso({ searchParams }: { searchParams: Promise
   return (
     <>
       <BackLink href="/backoffice/casos">Casos</BackLink>
-      <PageHead eyebrow="Escritório" title={<>Novo <em>caso</em></>} desc="A referência é atribuída automaticamente. Verifique a parte contrária em Conflitos." />
+      <PageHead eyebrow="Escritório" title={<>Novo <em>caso</em></>} desc="A referência é atribuída automaticamente." />
       <div className="card">
         <ActionForm action={createCase} className="form">
           <CaseFields value={{ client_id: cliente ?? '', responsible_id: me.id, opened_at: todayISO() }} clients={clients} members={members} areas={areas} />

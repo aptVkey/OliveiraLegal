@@ -28,7 +28,7 @@ export default async function Leads({ searchParams }: { searchParams: Promise<{ 
         eyebrow="Crescimento"
         title="Leads"
         desc={`${open.length} em aberto · ${eur(pipeline)} em pipeline`}
-        actions={<><Link className="btn btn--ghost btn--sm" href="/backoffice/conflitos">Verificar conflitos</Link><Link className="btn btn--sm" href="/backoffice/leads/novo">Nova lead</Link></>}
+        actions={<Link className="btn btn--sm" href="/backoffice/leads/novo">Nova lead</Link>}
       />
       <div className="toolbar">
         <LiveSearch placeholder="Procurar por nome ou empresa" />

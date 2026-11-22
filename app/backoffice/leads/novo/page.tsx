@@ -15,7 +15,7 @@ export default async function NovaLead() {
   return (
     <>
       <BackLink href="/backoffice/leads">Leads</BackLink>
-      <PageHead eyebrow="Crescimento" title={<>Nova <em>lead</em></>} desc="Antes de avançar, verifique conflitos de interesses com o nome e a empresa." />
+      <PageHead eyebrow="Crescimento" title={<>Nova <em>lead</em></>} />
       <div className="card">
         <ActionForm action={createLead} className="form">
           <LeadFields lead={{ owner_id: me.id, source: 'site' }} members={members} areas={areas} />
