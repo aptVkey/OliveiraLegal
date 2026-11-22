@@ -1,0 +1,24 @@
+<!doctype html><html lang="pt-PT"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light"><meta name="supported-color-schemes" content="light"><title>Nova palavra-passe</title></head>
+<body style="margin:0;padding:0;background:#F3EFE5;color:#3f4530;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;-webkit-text-size-adjust:100%">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;font-size:1px;line-height:1px">Recebemos um pedido para repor a sua palavra-passe.&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F3EFE5"><tr><td align="center" style="padding:28px 12px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px">
+<tr><td style="background:#626A43;border-radius:20px 20px 0 0;padding:34px 36px 30px" align="center">
+<img src="https://www.oliveiralegal.com/assets/brand/email-logo.png" width="220" height="63" alt="Oliveira Legal" style="display:block;border:0;outline:none;height:auto;max-width:220px">
+</td></tr>
+<tr><td style="background:#FBF9F4;padding:38px 36px 8px;border-left:1px solid #E6E1D6;border-right:1px solid #E6E1D6">
+<div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#7a7f66">Oliveira Legal · Área reservada</div>
+<h1 style="margin:10px 0 0;font:400 30px/1.15 Georgia,'Times New Roman',serif;color:#626A43;letter-spacing:-.01em">Nova palavra-passe</h1>
+</td></tr>
+<tr><td style="background:#FBF9F4;padding:18px 36px 36px;font-size:15px;line-height:1.7;border-left:1px solid #E6E1D6;border-right:1px solid #E6E1D6">
+<p style="margin:0 0 14px">Olá,</p><p style="margin:0">Recebemos um pedido para repor a palavra-passe da conta <strong>{{ .Email }}</strong>. Carregue no botão para escolher uma nova.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:26px 0 22px"><tr><td style="border-radius:999px;background:#626A43">
+<a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=recovery" style="display:inline-block;padding:14px 30px;font:400 14px/1 'Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:.03em;color:#F3EFE5;text-decoration:none;border-radius:999px">Escolher nova palavra-passe</a></td></tr></table>
+<p style="margin:0;font-size:14px">Este link é pessoal, só pode ser usado uma vez e tem validade limitada.</p>
+<p style="margin:22px 0 0;font-size:12px;line-height:1.6;color:#7a7f66">Se o botão não funcionar, copie este endereço para o browser:<br><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=recovery" style="color:#626A43;word-break:break-all">{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=recovery</a></p>
+</td></tr>
+<tr><td style="background:#F3EFE5;padding:22px 36px 26px;border:1px solid #E6E1D6;border-radius:0 0 20px 20px;font-size:12px;line-height:1.7;color:#7a7f66"><strong style="color:#3f4530">Não fez este pedido?</strong> Pode ignorar este e-mail: a sua palavra-passe atual continua a funcionar e ninguém tem acesso à sua conta.</td></tr>
+</table>
+<p style="margin:18px 0 0;font-size:11px;color:#7a7f66">Oliveira Legal · Sociedade de Advogados · Albufeira, Algarve</p>
+</td></tr></table></body></html>
