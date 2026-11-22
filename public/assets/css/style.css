@@ -508,3 +508,26 @@ main{position:relative;z-index:2;background:var(--ivory);overflow-x:clip}
   .statement .w{opacity:1!important}
   .frame img{transform:none!important}
 }
+
+/* Gestor de cookies — cores e tipografia da marca (oliva, marfim, Georgia + Cormorant, Helvetica Neue) */
+#stcm-wrapper{
+  --fontFamily:var(--sans);
+  --primaryColor:var(--olive);
+  --backgroundColor:var(--ivory);
+  --textColor:var(--olive);
+  --iconColor:var(--ivory);
+  --iconBackgroundColor:var(--olive);
+  --boxShadow:0 24px 60px rgba(98,106,67,.22);
+  --backdropBackgroundColor:rgba(243,239,229,.7);
+}
+#stcm-banner,#stcm-modal{border:1px solid var(--rule);border-radius:1.5rem;box-shadow:var(--boxShadow)}
+#stcm-banner p,#stcm-modal p{font:400 .9375rem/1.7 var(--sans);letter-spacing:.005em}
+#stcm-modal h1{font:400 clamp(1.6rem,3vw,2rem)/1.15 Georgia,"Times New Roman",serif;letter-spacing:-.01em}
+#stcm-modal legend{font:italic 400 1.25rem/1.3 var(--serif);color:var(--olive)}
+#stcm-wrapper .stcm-button{padding:.8rem 1.5rem;border:1px solid var(--olive);border-radius:999px;font:400 .8125rem/1.2 var(--sans);letter-spacing:.04em;transition:background-color .5s var(--ease),color .5s var(--ease)}
+#stcm-wrapper .stcm-button-primary:hover{background:transparent;color:var(--olive)}
+#stcm-wrapper .stcm-button-secondary{background:transparent;color:var(--olive)}
+#stcm-wrapper .stcm-button-secondary:hover{background:var(--olive);color:var(--ivory)}
+#stcm-banner .stcm-preferences-button{font:400 .8125rem/1.2 var(--sans);letter-spacing:.04em}
+#stcm-wrapper a{text-underline-offset:.25em}
+#stcm-wrapper :focus-visible{outline:2px solid var(--olive);outline-offset:3px}
